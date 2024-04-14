@@ -1,0 +1,65 @@
+<?php
+$start = microtime(true);
+function route($method, $urlList, $requestData)
+{
+    if ($method == "POST") {
+        $link = mysqli_connect('localhost', 'root', 'root', 'users');
+        switch ($urlList[2]) {
+            case "login":
+                $login = $requestData->body->login;
+                $password = hash("sha1", $requestData->body->password);
+
+
+                $user = $link->query("SELECT `id` FROM users WHERE `login`='$login'")->fetch_assoc();
+                if (!is_null($user)) {
+                    $token = bin2hex(random_bytes(16));
+                    $userID = $user['id'];
+                    $tokenSelectResult = $link->query("SELECT * FROM  `tokens` WHERE `userID`='$userID'")->fetch_assoc();
+                    if (empty($tokenSelectResult)) {
+                        $tokenInsertResult = $link->query("INSERT INTO `tokens`(`value`, `userID`) VALUES('$token', '$userID')");
+                        if (!$tokenInsertResult) {
+                            //4000
+                            echo "too bad";
+                        } else {
+                            echo json_encode(['token' => $token]);
+                        }
+
+                    } else {
+                        echo "у пользователя уже имеется токен";
+                        break;
+                    }
+                    } else {
+                        echo "400: input data incorrect";
+                    }
+                    echo json_encode($userID);
+
+                case "registration":
+                    $token = bin2hex(random_bytes(16));
+                    $name = $requestData->body->name;
+                    $login = $requestData->body->login;
+                    $password = hash("sha1", $requestData->body->password);
+
+                    $loginSelectResult = $link->query("SELECT * FROM  `users` WHERE `login`='$login'")->fetch_assoc();
+                    if (!empty($tokenSelectResult['id'])) {
+                        echo "466: Пользователь с таким логином уже существует";
+                        break;
+                    } else {
+                        $loginInsertResult = $link->query("INSERT INTO `users`(`name`, `login`, `password`) VALUES('$name', '$login', '$password')");
+                        $user = $link->query("SELECT `id` FROM users WHERE `login`='$login'")->fetch_assoc();
+                        $userID = $user['id'];
+                        $tokenSelectResult = $link->query("SELECT * FROM  `tokens` WHERE `userID`='$userID'")->fetch_assoc();
+                        $tokenInsertResult = $link->query("INSERT INTO `tokens`(`value`, `userID`) VALUES('$token', '$userID')");
+                        echo "description: Пользователь успешно добавлен.";
+                    }
+                    default;
+                    break;
+
+            }
+        }
+
+    else
+        {
+            //400
+            echo "bad request";
+        }
+    }
