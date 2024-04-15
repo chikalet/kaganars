@@ -51,15 +51,29 @@ function route($method, $urlList, $requestData)
                         $tokenInsertResult = $link->query("INSERT INTO `tokens`(`value`, `userID`) VALUES('$token', '$userID')");
                         echo "description: Пользователь успешно добавлен.";
                     }
-                    default;
-                    break;
+                    case 'CreateTag':
+                    $link = mysqli_connect('localhost', 'root', 'root', 'users');
+                    $nameTag = $requestData->body->nameTag;
+                    $TagSelestResult = $link->query("SELECT * FROM Tags WHERE `name_group`='$nameTag'")->fetch_assoc();
+                    if (!empty($TagSelestResult['Tag_ID'])) {
+                        echo "467: Тег уже существует";
+                        break;
+                    } else {
+                        $TagInsertResult = $link->query("INSERT INTO `Tags`(`name_group`) VALUES('$nameTag')");
+                        echo "description: Тег успешно создан.";
+                    }
+                case 'CreateFitch':
+                    $link = mysqli_connect('localhost', 'root', 'root', 'users');
+                    $nameFitch = $requestData->body->nameFitch;
+                    $FitchSelestResult = $link->query("SELECT * FROM Features WHERE `name_features`='$nameFitch'")->fetch_assoc();
+                    if (!empty($FirchSelestResult['Feature_ID'])) {
+                        echo "468: Функция уже существует";
+                        break;
+                    } else {
+                        $FitchInsertResult = $link->query("INSERT INTO `Features`(`name_features`) VALUES('$nameFitch')");
+                        echo "description: Фича успешно создана.";
+                    }
 
             }
-        }
-
-    else
-        {
-            //400
-            echo "bad request";
         }
     }
