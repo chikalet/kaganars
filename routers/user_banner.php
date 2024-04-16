@@ -17,26 +17,5 @@ function route($method, $urlList, $requestData)
                 }
                 break;
         }
-    } else if ($method == "POST") {
-        $link = mysqli_connect('localhost', 'root', 'root', 'users');
-        switch ($urlList[1]) {
-            case 'banner':
-                $tagID = $requestData->body->tagID;
-                $loginUser = $requestData->body->loginUser;
-                $loginSelestResult = $link->query("SELECT * FROM users WHERE `login`='$loginUser'")->fetch_assoc();
-                $userID = $loginSelestResult['id'];
-                $TagSelestResult = $link->query("SELECT * FROM Tags WHERE `Tag_ID`='$tagID'")->fetch_assoc();
-                if (empty($TagSelestResult['Tag_ID'])) {
-                    var_dump(http_response_code(404));
-                    echo "404: тег не найден";
-                    break;
-                } else if (empty($loginSelestResult['id'])) {
-                    var_dump(http_response_code(404));
-                    echo "404: пользователь не найден";
-                } else {
-                    $AddInsertResult = $link->query("UPDATE `tokens` SET `tag`='$tagID' WHERE `userID`='$userID'");
-                }
-                echo "description: Тег успешно присвоен.";
-        }
     }
 }
