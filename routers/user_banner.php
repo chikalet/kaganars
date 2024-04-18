@@ -3,7 +3,7 @@ $start = microtime(true);
 function route($method, $urlList, $requestData)
 {
     if ($method == 'GET') {
-        $link = mysqli_connect('localhost', 'root', 'root', 'users');
+        $link = mysqli_connect('mysql', 'root', 's123123', 'users');
         switch ($urlList[1]) {
             case 'user_banner':
                 $token = substr(getallheaders()['Authorization'], 7);

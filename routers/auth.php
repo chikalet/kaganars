@@ -3,7 +3,7 @@ $start = microtime(true);
 function route($method, $urlList, $requestData)
 {
     if ($method == "POST") {
-        $link = mysqli_connect('localhost', 'root', 'root', 'users');
+        $link = mysqli_connect('mysql', 'root', 's123123', 'users');
         switch ($urlList[2]) {
             case "registration":
                 $token = bin2hex(random_bytes(16));
@@ -11,7 +11,7 @@ function route($method, $urlList, $requestData)
                 $login = $requestData->body->login;
                 $password = hash("sha1", $requestData->body->password);
                 $loginSelectResult = $link->query("SELECT * FROM  `users` WHERE `login`='$login'")->fetch_assoc();
-                if (!empty($tokenSelectResult['id'])) {
+                if (!empty($loginSelectResult['id'])) {
                     echo "466: Пользователь с таким логином уже существует";
                     break;
                 } else {
@@ -21,9 +21,11 @@ function route($method, $urlList, $requestData)
                     $tokenSelectResult = $link->query("SELECT * FROM  `tokens` WHERE `userID`='$userID'")->fetch_assoc();
                     $tokenInsertResult = $link->query("INSERT INTO `tokens`(`value`, `userID`) VALUES('$token', '$userID')");
                     echo "description: Пользователь успешно добавлен.";
+                    break;
                 }
             case 'CreateTag':
-                $link = mysqli_connect('localhost', 'root', 'root', 'users');
+                $link = mysqli_connect('mysql', 'root', 's123123', 'users');
+                $token = substr(getallheaders()['Authorization'], 7);
                 $token = substr(getallheaders()['Authorization'], 7);
                 $nameTag = $requestData->body->nameTag;
                 $tokenSelestResult = $link->query("SELECT * FROM tokens WHERE `value`='$token'")->fetch_assoc();
@@ -39,9 +41,11 @@ function route($method, $urlList, $requestData)
                 } else {
                     $TagInsertResult = $link->query("INSERT INTO `Tags`(`name_group`) VALUES('$nameTag')");
                     echo "description: Тег успешно создан.";
+                    break;
                 }
             case 'CreateFitch':
-                $link = mysqli_connect('localhost', 'root', 'root', 'users');
+                $link = mysqli_connect('mysql', 'root', 's123123', 'users');
+                $token = substr(getallheaders()['Authorization'], 7);
                 $token = substr(getallheaders()['Authorization'], 7);
                 $nameFitch = $requestData->body->nameFitch;
                 $tokenSelestResult = $link->query("SELECT * FROM tokens WHERE `value`='$token'")->fetch_assoc();
@@ -57,9 +61,11 @@ function route($method, $urlList, $requestData)
                 } else {
                     $FitchInsertResult = $link->query("INSERT INTO `Features`(`name_features`) VALUES('$nameFitch')");
                     echo "description: Фича успешно создана.";
+                    break;
                 }
             case 'AddTagUser':
-                $link = mysqli_connect('localhost', 'root', 'root', 'users');
+                $link = mysqli_connect('mysql', 'root', 's123123', 'users');
+                $token = substr(getallheaders()['Authorization'], 7);
                 $token = substr(getallheaders()['Authorization'], 7);
                 $tagID = $requestData->body->tagID;
                 $loginUser = $requestData->body->loginUser;
@@ -77,6 +83,39 @@ function route($method, $urlList, $requestData)
                 } else {
                     $AddInsertResult = $link->query("UPDATE `tokens` SET `tag`='$tagID' WHERE `userID`='$userID'");
                     echo "description: Тег успешно присвоен.";
+                    break;
+                }
+        }
+    } else if ($method == 'GET') {
+        $link = mysqli_connect('mysql', 'root', 's123123', 'users');
+        switch ($urlList[2]) {
+            case 'features':
+                $features = $link->query("SELECT * FROM `Features`");
+                if ($features) {
+                    while ($row = $features->fetch_assoc()) {
+                        echo "Feature_ID:   " . $features_id = $row['Feature_ID'];
+                        echo "    name_features:   " . $features_name = $row['name_features'] . PHP_EOL;
+                    }
+                }
+                break;
+            case 'tags':
+                $tags = $link->query("SELECT * FROM `Tags`");
+                if ($tags) {
+                    while ($row = $tags->fetch_assoc()) {
+                        echo "Tag_ID:   " . $tags_id = $row['Tag_ID'];
+                        echo "    name_group:   " . $tags_name = $row['name_group'] . PHP_EOL;
+                    }
+                }
+                break;
+            case 'banners':
+                $banners = $link->query("SELECT * FROM `Banners`");
+                if ($banners) {
+                    while ($row = $banners->fetch_assoc()) {
+                        echo "Banner ID:   " . $tags_id = $row['Banner_ID'];
+                        echo "    Feature_ID:   " . $tags_name = $row['Feature_ID'];
+                        echo "    active:   " . $tags_id = $row['active'];
+                        echo "    name_banner:   " . $tags_name = $row['name_banner'] . PHP_EOL;
+                    }
                 }
         }
     } else if ($method == 'GET') {

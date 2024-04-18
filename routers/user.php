@@ -1,7 +1,7 @@
 <?php
 function route($method, $urlList, $requestData)
 {
-    $link = mysqli_connect('localhost', 'root', 'root', 'users');
+    $link = mysqli_connect('mysql', 'root', 's123123', 'users');
     switch ($method){
         case 'GET':
             $token = substr(getallheaders()['Authorization'], 7);
@@ -20,7 +20,7 @@ function route($method, $urlList, $requestData)
         case 'POST':
             $login = $requestData->body->login;
             $password = $requestData->body->password;
-            $link = mysqli_connect('localhost', 'root', 'root', 'users');
+            $link = mysqli_connectmysqli_connect('mysql', 'root', 's123123', 'users');
             $user = $link->query("SELECT `id` FROM users WHERE `login`='$login'")->fetch_assoc();
 
             if (is_null($user))

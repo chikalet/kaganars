@@ -24,7 +24,7 @@
     }
 
     header('Content-type: application/json');
-    $link = mysqli_connect('localhost', 'root', 'root', 'users');
+    $link = mysqli_connect('mysql', 'root', 's123123', 'users');
 
     if (!$link)
     {
